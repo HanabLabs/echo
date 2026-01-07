@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 
 export const metadata = {
     title: '利用規約 | ECHO',
-    description: 'ECHO - 人格が成長するAI Twitter運用アプリの利用規約',
+    description: 'ECHO - 人格が成長するAIとのX運用アプリの利用規約',
 }
 
 export default function TermsPage() {

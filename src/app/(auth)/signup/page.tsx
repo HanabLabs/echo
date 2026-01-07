@@ -63,7 +63,7 @@ export default function SignupPage() {
                             ECHO
                         </h1>
                         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                            人格が成長するAI Twitter運用アプリ
+                            人格が成長するAIとのX運用アプリ
                         </p>
                     </div>
 

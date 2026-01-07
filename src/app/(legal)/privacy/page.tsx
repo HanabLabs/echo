@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 
 export const metadata = {
     title: 'プライバシーポリシー | ECHO',
-    description: 'ECHO - 人格が成長するAI Twitter運用アプリのプライバシーポリシー',
+    description: 'ECHO - 人格が成長するAIとのX運用アプリのプライバシーポリシー',
 }
 
 export default function PrivacyPage() {

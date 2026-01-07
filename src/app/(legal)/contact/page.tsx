@@ -3,7 +3,7 @@ import { ArrowLeft, Mail, Twitter } from 'lucide-react'
 
 export const metadata = {
     title: 'お問い合わせ | ECHO',
-    description: 'ECHO - 人格が成長するAI Twitter運用アプリへのお問い合わせ',
+    description: 'ECHO - 人格が成長するAIとのX運用アプリへのお問い合わせ',
 }
 
 export default function ContactPage() {
