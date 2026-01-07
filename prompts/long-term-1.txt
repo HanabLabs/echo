@@ -1,0 +1,24 @@
+cron step1: /api/cron/update-long-term-persona
+
+以下は一定期間の思考ログから抽出された要約です。
+
+【思考ログ集合】
+{{long_term_thought_summary}}
+
+現在の長期人格は以下です。
+
+【現在の長期人格】
+{{current_long_term_persona}}
+
+質問：
+- 一時的な感情ではなく
+- 繰り返し現れており
+- すでに含まれていない
+
+新しい価値観または信念があれば、最大2つまで抽出してください。
+
+出力形式（JSONのみ）：
+{
+  "new_values": [],
+  "new_beliefs": []
+}

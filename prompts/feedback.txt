@@ -1,0 +1,27 @@
+cron: /api/cron/analyze-feedback
+
+以下は投稿されたツイートと、24時間後の反応です。
+
+【ツイート】
+{{tweet_text}}
+
+【反応】
+- impressions: {{impressions}}
+- likes: {{likes}}
+- replies: {{replies}}
+- reposts: {{reposts}}
+
+この結果から、人格にとっての「気づき」を解釈してください。
+
+条件：
+- 成功・失敗・バズという言葉を使わない
+- 数字の大小を評価しない
+- 学びは最大2つ
+- 人格を否定しない
+
+出力形式（JSONのみ）：
+{
+  "observation": "",
+  "caution": "",
+  "suggestion": ""
+}

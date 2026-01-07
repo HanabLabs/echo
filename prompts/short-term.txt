@@ -1,0 +1,22 @@
+API: /api/persona/short-term/update
+
+以下は直近5件の思考ログを要約したものです。
+
+【思考ログ要約】
+{{recent_thought_logs_summary}}
+
+これをもとに、現在の「短期人格」を生成してください。
+
+条件：
+- 矛盾や揺れは解消しない
+- ネガティブな感情もそのまま含める
+- 行動指針や改善案は出さない
+- 将来を最適化しない
+
+出力形式（JSONのみ）：
+{
+  "dominant_emotions": [],
+  "mental_state": "",
+  "current_focus": "",
+  "volatility": 0.0
+}

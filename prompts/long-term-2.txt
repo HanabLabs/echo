@@ -1,0 +1,20 @@
+cron step2: /api/cron/update-long-term-persona
+
+以下は長期人格の候補です。
+
+【候補】
+{{candidates}}
+
+これらが人格に「定着する」ほど安定しているかを判断してください。
+
+条件：
+- 感情的すぎるものは除外
+- 既存人格と強く矛盾するものは除外
+- 最大1つまで
+
+出力形式（JSONのみ）：
+{
+  "accepted": true or false,
+  "final_value": "",
+  "reason": ""
+}

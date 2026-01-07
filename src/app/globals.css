@@ -1,0 +1,329 @@
+@import "tailwindcss";
+
+/* ====================================
+   ECHO - 5テーマカラーパレット
+   ==================================== */
+
+/* Soft (default) - 温かみのあるナチュラルテーマ */
+:root,
+[data-theme="soft"] {
+  --bg-primary: #f8f5f0;
+  --bg-secondary: #ebe7e0;
+  --bg-tertiary: #ddd8cf;
+  --text-primary: #3d3d3d;
+  --text-secondary: #6b6b6b;
+  --text-muted: #999999;
+  --accent: #8b7355;
+  --accent-hover: #725f47;
+  --accent-light: #a89070;
+  --border: #d4cfc4;
+  --shadow: rgba(139, 115, 85, 0.12);
+  --chat-user: #e8e3d9;
+  --chat-partner: #ffffff;
+  --success: #6b8e6b;
+  --error: #c27373;
+  --warning: #c2a873;
+}
+
+/* Dark - モダンでシックなダークテーマ */
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  --text-primary: #eaeaea;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6a6a6a;
+  --accent: #e94560;
+  --accent-hover: #d63d56;
+  --accent-light: #ff6b7a;
+  --border: #2d2d4a;
+  --shadow: rgba(233, 69, 96, 0.15);
+  --chat-user: #252545;
+  --chat-partner: #1e1e3a;
+  --success: #4ecdc4;
+  --error: #ff6b6b;
+  --warning: #ffd93d;
+}
+
+/* Light - クリーンで明るいテーマ */
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #ebebeb;
+  --text-primary: #2d2d2d;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --accent: #4a90d9;
+  --accent-hover: #3a7bc8;
+  --accent-light: #6ba8eb;
+  --border: #e0e0e0;
+  --shadow: rgba(74, 144, 217, 0.1);
+  --chat-user: #e8f1fb;
+  --chat-partner: #ffffff;
+  --success: #48bb78;
+  --error: #e53e3e;
+  --warning: #ed8936;
+}
+
+/* Midnight - 深い夜空のようなテーマ */
+[data-theme="midnight"] {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --accent: #58a6ff;
+  --accent-hover: #388bfd;
+  --accent-light: #79c0ff;
+  --border: #30363d;
+  --shadow: rgba(88, 166, 255, 0.1);
+  --chat-user: #1c2128;
+  --chat-partner: #161b22;
+  --success: #3fb950;
+  --error: #f85149;
+  --warning: #d29922;
+}
+
+/* Sunset - 夕焼けの温かみのあるテーマ */
+[data-theme="sunset"] {
+  --bg-primary: #2d1b4e;
+  --bg-secondary: #1f1333;
+  --bg-tertiary: #3d2a5f;
+  --text-primary: #f0e6d3;
+  --text-secondary: #c4b5a5;
+  --text-muted: #8a7d70;
+  --accent: #ff7e5f;
+  --accent-hover: #ff6b4a;
+  --accent-light: #ffb088;
+  --border: #4a3570;
+  --shadow: rgba(255, 126, 95, 0.15);
+  --chat-user: #3a2460;
+  --chat-partner: #2d1b4e;
+  --success: #7ed56f;
+  --error: #ff6b6b;
+  --warning: #ffc857;
+}
+
+/* ====================================
+   Tailwind Theme Integration
+   ==================================== */
+/* stylelint-disable-next-line */
+@theme inline {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-border: var(--border);
+  --color-chat-user: var(--chat-user);
+  --color-chat-partner: var(--chat-partner);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ====================================
+   Base Styles
+   ==================================== */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ====================================
+   Scrollbar Styles
+   ==================================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ====================================
+   Focus Styles
+   ==================================== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ====================================
+   Selection Styles
+   ==================================== */
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+/* ====================================
+   Link Styles
+   ==================================== */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* ====================================
+   Button Base Styles
+   ==================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-tertiary);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ====================================
+   Input Base Styles
+   ==================================== */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--shadow);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ====================================
+   Card Styles
+   ==================================== */
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* ====================================
+   Animation Utilities
+   ==================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}

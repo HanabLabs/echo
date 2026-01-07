@@ -1,0 +1,101 @@
+【権限種別の定義】
+
+| 種別          | 説明                         |
+| ----------- | -------------------------- |
+| **User**    | Supabase auth の通常ユーザ（フロント） |
+| **Service** | service_role key を使うサーバー   |
+| **Cron**    | Service の一種（定期実行）          |
+| **AI**      | API内で呼ばれる LLM（DB直アクセス不可）   |
+
+【思考ログ系】
+POST /api/thought-log
+  --ユーザの内面入力は「本人の手」で保存する。
+
+呼び出し元: User
+DB権限: User
+触るテーブル: `thought_logs`（insert）
+AI: 思考ログ構造化のみ
+service_role: ❌    
+
+POST /api/thought-log/analyze
+  --解釈は人格更新の前段。フロントから直接触らせない。
+
+呼び出し元: Service
+DB権限: Service
+触るテーブル: `thought_log_features`
+トリガ: thought-log 作成後
+service_role: ✅
+
+【短期人格系】
+POST /api/persona/short-term/update
+  --短期人格は人格そのものなので、ユーザにも編集させない。
+
+呼び出し元: Cron
+DB権限: Service
+触るテーブル: `persona_short_term`, `persona_short_term_history`
+AI: 心の要約
+条件: 思考ログ 5件蓄積するたび
+
+【長期人格系】
+POST /api/cron/update-long-term-persona
+  --「成長」は時間と蓄積で起きる。
+
+呼び出し元: Cron
+DB権限: Service
+触るテーブル: persona_long_term, persona_evolution_logs
+AI: 二段階判定
+条件: 思考ログ 30件蓄積するたび
+
+【ツイート生成系】
+POST /api/tweets/generate
+  --ツイート案は「一緒に考える」体験。
+
+呼び出し元:  User
+DB権限: User
+触るテーブル: tweets_generated
+AI: ツイート生成
+service_role: ❌
+
+【投稿系】
+POST /api/tweets/post
+  --X API トークンを守るため。User権限でDBは書かせない。
+
+呼び出し元: User
+DB権限: Service
+触るテーブル: tweets_posted
+外部: X API
+service_role: ✅
+
+【外界フィードバック系】
+POST /api/cron/fetch-tweet-metrics
+
+呼び出し元: Cron
+DB権限: Service
+触るテーブル: tweet_metrics
+外部: X API
+service_role: ✅
+
+POST /api/cron/analyze-feedback
+
+呼び出し元: Cron
+DB権限: Service
+触るテーブル: external_feedback
+AI: 意味解釈
+service_role: ✅
+
+【閲覧系】
+GET /api/persona/overview
+
+呼び出し元: User
+DB権限: User
+触るテーブル: persona系 + evolution_logs
+更新: ❌
+
+GET /api/tweets/history
+
+呼び出し元: User
+DB権限: User
+触るテーブル: tweets / feedback
+更新: ❌
+
+

@@ -1,0 +1,22 @@
+API: /api/thought-log/analyze
+
+以下はユーザが入力した「思考ログ」です。
+
+【思考ログ】
+{{thought_log}}
+
+この内容から、人格形成のための要素を抽出してください。
+
+ルール：
+- 感情（emotions）は一時的なもの
+- 価値観（values）・信念（beliefs）は長期的なもの
+- 解釈しすぎず、ユーザの言葉を尊重する
+- 断定表現を使わない
+
+出力形式（JSONのみ）：
+{
+  "emotions": [],
+  "values": [],
+  "beliefs": [],
+  "topics": []
+}

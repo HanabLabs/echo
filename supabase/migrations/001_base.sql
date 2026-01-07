@@ -1,0 +1,278 @@
+-- ===============================================
+-- ECHO - ベーステーブル作成
+-- ===============================================
+
+-- UUID生成用
+create extension if not exists "uuid-ossp";
+
+-- ===============================================
+-- テーブル作成
+-- ===============================================
+
+-- 思考ログ
+create table thought_logs (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  content text not null,
+  created_at timestamp with time zone default now()
+);
+
+-- 思考ログの抽象化
+create table thought_log_features (
+  id uuid primary key default uuid_generate_v4(),
+  thought_log_id uuid not null references thought_logs(id) on delete cascade,
+  user_id uuid not null,
+  emotions jsonb not null default '[]',
+  values jsonb not null default '[]',
+  beliefs jsonb not null default '[]',
+  topics jsonb not null default '[]',
+  created_at timestamp with time zone default now()
+);
+
+-- 人格憲法
+create table persona_core (
+  user_id uuid primary key,
+  prohibited jsonb not null default '[]',
+  tweet_rules jsonb not null default '{}',
+  priority jsonb not null default '{}',
+  updated_at timestamp with time zone default now()
+);
+
+-- 人格の長期的な状態
+create table persona_long_term (
+  user_id uuid primary key,
+  values jsonb not null default '[]',
+  beliefs jsonb not null default '[]',
+  writing_style jsonb not null default '{}',
+  taboos jsonb not null default '[]',
+  last_evaluated_at timestamp with time zone,
+  updated_at timestamp with time zone default now()
+);
+
+-- 人格の短期的な状態
+create table persona_short_term (
+  user_id uuid primary key,
+  dominant_emotions jsonb not null default '[]',
+  mental_state text not null,
+  current_focus text not null,
+  volatility real not null,
+  created_at timestamp with time zone default now()
+);
+
+-- 人格の短期的な状態の履歴
+create table persona_short_term_history (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  snapshot jsonb not null,
+  created_at timestamp with time zone default now()
+);
+
+-- 人格進化ログ
+create table persona_evolution_logs (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  event_type text not null,
+  details jsonb not null default '{}',
+  created_at timestamp with time zone default now()
+);
+
+-- 生成されたツイート
+create table tweets_generated (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  type text not null check (type in ('reflective', 'positive', 'honest')),
+  content text not null,
+  persona_snapshot jsonb not null,
+  created_at timestamp with time zone default now()
+);
+
+-- 投稿されたツイート
+create table tweets_posted (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null,
+  tweet_id text not null,
+  content text not null,
+  generated_id uuid references tweets_generated(id),
+  posted_at timestamp with time zone default now()
+);
+
+-- ツイートの数値
+create table tweet_metrics (
+  id uuid primary key default uuid_generate_v4(),
+  tweet_id uuid not null references tweets_posted(id) on delete cascade,
+  impressions integer not null default 0,
+  likes integer not null default 0,
+  replies integer not null default 0,
+  reposts integer not null default 0,
+  fetched_at timestamp with time zone default now()
+);
+
+-- 外部（twitter）からのフィードバック
+create table external_feedback (
+  id uuid primary key default uuid_generate_v4(),
+  tweet_id uuid not null references tweets_posted(id) on delete cascade,
+  user_id uuid,
+  observation text not null,
+  caution text,
+  suggestion text,
+  created_at timestamp with time zone default now()
+);
+
+-- ===============================================
+-- インデックス
+-- ===============================================
+create index idx_thought_logs_user on thought_logs(user_id);
+create index idx_thought_features_user on thought_log_features(user_id);
+create index idx_tweets_posted_user on tweets_posted(user_id);
+create index idx_evolution_logs_user on persona_evolution_logs(user_id);
+
+-- ===============================================
+-- RLS有効化
+-- ===============================================
+alter table thought_logs enable row level security;
+alter table thought_log_features enable row level security;
+alter table persona_core enable row level security;
+alter table persona_long_term enable row level security;
+alter table persona_short_term enable row level security;
+alter table persona_short_term_history enable row level security;
+alter table persona_evolution_logs enable row level security;
+alter table tweets_generated enable row level security;
+alter table tweets_posted enable row level security;
+alter table tweet_metrics enable row level security;
+alter table external_feedback enable row level security;
+
+-- ===============================================
+-- RLSポリシー
+-- ===============================================
+
+-- thought_logs
+create policy "select own thought logs"
+on thought_logs for select
+using (user_id = auth.uid());
+
+create policy "insert own thought logs"
+on thought_logs for insert
+with check (user_id = auth.uid());
+
+-- thought_log_features
+create policy "select own thought log features"
+on thought_log_features for select
+using (user_id = auth.uid());
+
+create policy "insert own thought log features"
+on thought_log_features for insert
+with check (user_id = auth.uid());
+
+-- persona_core
+create policy "select own persona core"
+on persona_core for select
+using (user_id = auth.uid());
+
+create policy "update own persona core"
+on persona_core for update
+using (user_id = auth.uid());
+
+create policy "insert own persona core"
+on persona_core for insert
+with check (user_id = auth.uid());
+
+-- persona_long_term
+create policy "select own long term persona"
+on persona_long_term for select
+using (user_id = auth.uid());
+
+create policy "insert own long term persona"
+on persona_long_term for insert
+with check (user_id = auth.uid());
+
+-- persona_short_term
+create policy "select own short term persona"
+on persona_short_term for select
+using (user_id = auth.uid());
+
+create policy "insert own short term persona"
+on persona_short_term for insert
+with check (user_id = auth.uid());
+
+-- persona_short_term_history
+create policy "select own short term history"
+on persona_short_term_history for select
+using (user_id = auth.uid());
+
+create policy "insert own short term history"
+on persona_short_term_history for insert
+with check (user_id = auth.uid());
+
+-- persona_evolution_logs
+create policy "select own evolution logs"
+on persona_evolution_logs for select
+using (user_id = auth.uid());
+
+create policy "insert own evolution logs"
+on persona_evolution_logs for insert
+with check (user_id = auth.uid());
+
+-- tweets_generated
+create policy "select own generated tweets"
+on tweets_generated for select
+using (user_id = auth.uid());
+
+create policy "insert own generated tweets"
+on tweets_generated for insert
+with check (user_id = auth.uid());
+
+create policy "update own generated tweets"
+on tweets_generated for update
+using (user_id = auth.uid());
+
+create policy "delete own generated tweets"
+on tweets_generated for delete
+using (user_id = auth.uid());
+
+-- tweets_posted
+create policy "select own posted tweets"
+on tweets_posted for select
+using (user_id = auth.uid());
+
+create policy "insert own posted tweets"
+on tweets_posted for insert
+with check (user_id = auth.uid());
+
+-- tweet_metrics
+create policy "select own tweet metrics"
+on tweet_metrics for select
+using (
+  exists (
+    select 1
+    from tweets_posted tp
+    where tp.id = tweet_metrics.tweet_id
+      and tp.user_id = auth.uid()
+  )
+);
+
+create policy "insert own tweet metrics"
+on tweet_metrics for insert
+with check (
+  exists (
+    select 1
+    from tweets_posted tp
+    where tp.id = tweet_metrics.tweet_id
+      and tp.user_id = auth.uid()
+  )
+);
+
+-- external_feedback
+create policy "select own external feedback"
+on external_feedback for select
+using (
+  exists (
+    select 1
+    from tweets_posted tp
+    where tp.id = external_feedback.tweet_id
+      and tp.user_id = auth.uid()
+  )
+);
+
+create policy "insert own external feedback"
+on external_feedback for insert
+with check (user_id = auth.uid());
