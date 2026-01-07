@@ -171,8 +171,9 @@ export default function HomePage() {
             }
             setMessages(prev => [...prev, partnerMessage])
             setTotalThoughtLogs(prev => prev + 1)
+            setLoading(false) // ローディングを先に解除
 
-            // プロファイルを更新
+            // プロファイルを更新（バックグラウンドで実行）
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
@@ -195,8 +196,8 @@ export default function HomePage() {
                 timestamp: new Date(),
             }
             setMessages(prev => [...prev, errorMessage])
+            setLoading(false) // エラー時もローディング解除
         } finally {
-            setLoading(false)
             setMode('idle')
         }
     }
