@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/browser'
@@ -10,36 +10,52 @@ function VerifyContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const email = searchParams.get('email') || ''
+    const [otp, setOtp] = useState('')
     const [loading, setLoading] = useState(false)
     const [resendLoading, setResendLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [resendSuccess, setResendSuccess] = useState(false)
 
-    // Supabaseの認証コールバックをチェック
-    useEffect(() => {
-        const supabase = createClient()
+    const handleVerifyOtp = async (e: React.FormEvent) => {
+        e.preventDefault()
 
-        const checkSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (session) {
-                // セッションがあればオンボーディングへ
-                router.push('/onboarding')
-            }
+        if (!email || !otp) {
+            setError('メールアドレスとコードを入力してください')
+            return
         }
 
-        checkSession()
+        if (otp.length !== 6) {
+            setError('6桁のコードを入力してください')
+            return
+        }
 
-        // 認証状態の変化を監視
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                router.push('/onboarding')
+        setLoading(true)
+        setError(null)
+
+        try {
+            const supabase = createClient()
+            const { error: verifyError } = await supabase.auth.verifyOtp({
+                email,
+                token: otp,
+                type: 'signup',
+            })
+
+            if (verifyError) {
+                setError('認証コードが無効です。もう一度お試しください。')
+                return
             }
-        })
 
-        return () => subscription.unsubscribe()
-    }, [router])
+            // 認証成功 → オンボーディングへ
+            router.push('/onboarding')
+        } catch (err) {
+            console.error('Verify error:', err)
+            setError('認証中にエラーが発生しました')
+        } finally {
+            setLoading(false)
+        }
+    }
 
-    const handleResendEmail = async () => {
+    const handleResendOtp = async () => {
         if (!email) {
             setError('メールアドレスが見つかりません')
             return
@@ -89,7 +105,7 @@ function VerifyContent() {
                         </div>
 
                         <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-                            メールを確認してください
+                            認証コードを入力
                         </h2>
 
                         <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
@@ -97,41 +113,65 @@ function VerifyContent() {
                                 <>
                                     <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{email}</span>
                                     <br />
-                                    に認証メールを送信しました。
-                                    <br />
-                                    メール内のリンクをクリックして認証を完了してください。
+                                    に送信された6桁のコードを入力してください。
                                 </>
                             ) : (
                                 <>
-                                    登録したメールアドレスに認証メールを送信しました。
-                                    <br />
-                                    メール内のリンクをクリックして認証を完了してください。
+                                    登録したメールアドレスに6桁のコードを送信しました。
                                 </>
                             )}
                         </p>
 
-                        {resendSuccess && (
-                            <div
-                                className="flex items-center justify-center gap-2 text-sm p-3 rounded-lg mb-4"
-                                style={{ backgroundColor: 'var(--success)', color: 'white' }}
-                            >
-                                <CheckCircle className="w-4 h-4" />
-                                認証メールを再送信しました
-                            </div>
-                        )}
+                        <form onSubmit={handleVerifyOtp} className="space-y-4">
+                            <input
+                                type="text"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                className="input text-center text-2xl tracking-widest"
+                                placeholder="000000"
+                                maxLength={6}
+                                disabled={loading}
+                                autoFocus
+                            />
 
-                        {error && (
-                            <div
-                                className="text-sm p-3 rounded-lg mb-4"
-                                style={{ backgroundColor: 'var(--error)', color: 'white' }}
-                            >
-                                {error}
-                            </div>
-                        )}
+                            {resendSuccess && (
+                                <div
+                                    className="flex items-center justify-center gap-2 text-sm p-3 rounded-lg"
+                                    style={{ backgroundColor: 'var(--success)', color: 'white' }}
+                                >
+                                    <CheckCircle className="w-4 h-4" />
+                                    認証コードを再送信しました
+                                </div>
+                            )}
 
-                        <div className="space-y-3">
+                            {error && (
+                                <div
+                                    className="text-sm p-3 rounded-lg"
+                                    style={{ backgroundColor: 'var(--error)', color: 'white' }}
+                                >
+                                    {error}
+                                </div>
+                            )}
+
                             <button
-                                onClick={handleResendEmail}
+                                type="submit"
+                                disabled={loading || otp.length !== 6}
+                                className="btn btn-primary w-full"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        認証中...
+                                    </>
+                                ) : (
+                                    '認証する'
+                                )}
+                            </button>
+                        </form>
+
+                        <div className="mt-4 space-y-3">
+                            <button
+                                onClick={handleResendOtp}
                                 disabled={resendLoading || !email}
                                 className="btn btn-secondary w-full"
                             >
@@ -141,11 +181,11 @@ function VerifyContent() {
                                         送信中...
                                     </>
                                 ) : (
-                                    'メールを再送信'
+                                    'コードを再送信'
                                 )}
                             </button>
 
-                            <Link href="/login" className="btn btn-primary w-full">
+                            <Link href="/login" className="btn btn-secondary w-full">
                                 ログインページへ
                             </Link>
                         </div>
