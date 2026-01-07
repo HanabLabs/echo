@@ -147,7 +147,8 @@ export async function refreshAccessToken(
  */
 export function generateAuthUrl(state: string, codeChallenge: string): string {
     const clientId = process.env.TWITTER_CLIENT_ID
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/twitter`
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '')
+    const redirectUri = `${appUrl}/api/auth/callback/twitter`
 
     if (!clientId) {
         throw new Error('Twitter OAuth credentials not configured')
@@ -175,7 +176,8 @@ export async function exchangeCodeForToken(
 ): Promise<TokenRefreshResponse> {
     const clientId = process.env.TWITTER_CLIENT_ID
     const clientSecret = process.env.TWITTER_CLIENT_SECRET
-    const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback/twitter`
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/\/$/, '')
+    const redirectUri = `${appUrl}/api/auth/callback/twitter`
 
     if (!clientId || !clientSecret) {
         throw new Error('Twitter OAuth credentials not configured')
